@@ -6,18 +6,17 @@ package repository
 import (
 	"database/sql"
 	"errors"
-
-	"github.com/knq/xoutil"
+	"time"
 )
 
 // Task represents a row from 'task'.
 type Task struct {
-	ID       sql.NullInt64  `json:"id"`        // id
+	ID       int64          `json:"id"`        // id
 	Name     string         `json:"name"`      // name
 	Comment  sql.NullString `json:"comment"`   // comment
 	Status   int            `json:"status"`    // status
-	CreateAt xoutil.SqTime  `json:"create_at"` // create_at
-	UpdateAt xoutil.SqTime  `json:"update_at"` // update_at
+	CreateAt time.Time      `json:"create_at"` // create_at
+	UpdateAt time.Time      `json:"update_at"` // update_at
 
 	// xo fields
 	_exists, _deleted bool
@@ -44,14 +43,14 @@ func (t *Task) Insert(db XODB) error {
 
 	// sql insert query, primary key provided by autoincrement
 	const sqlstr = `INSERT INTO task (` +
-		`name, comment, status, create_at, update_at` +
+		`name, comment, status` +
 		`) VALUES (` +
-		`?, ?, ?, ?, ?` +
+		`?, ?, ?` +
 		`)`
 
 	// run query
 	XOLog(sqlstr, t.Name, t.Comment, t.Status, t.CreateAt, t.UpdateAt)
-	res, err := db.Exec(sqlstr, t.Name, t.Comment, t.Status, t.CreateAt, t.UpdateAt)
+	res, err := db.Exec(sqlstr, t.Name, t.Comment, t.Status)
 	if err != nil {
 		return err
 	}
@@ -63,7 +62,7 @@ func (t *Task) Insert(db XODB) error {
 	}
 
 	// set primary key and existence
-	t.ID = sql.NullInt64(id)
+	t.ID = id
 	t._exists = true
 
 	return nil
@@ -85,12 +84,12 @@ func (t *Task) Update(db XODB) error {
 
 	// sql query
 	const sqlstr = `UPDATE task SET ` +
-		`name = ?, comment = ?, status = ?, create_at = ?, update_at = ?` +
+		`name = ?, comment = ?, status = ?, update_at = (DATETIME('now','localtime'))` +
 		` WHERE id = ?`
 
 	// run query
 	XOLog(sqlstr, t.Name, t.Comment, t.Status, t.CreateAt, t.UpdateAt, t.ID)
-	_, err = db.Exec(sqlstr, t.Name, t.Comment, t.Status, t.CreateAt, t.UpdateAt, t.ID)
+	_, err = db.Exec(sqlstr, t.Name, t.Comment, t.Status, t.ID)
 	return err
 }
 
@@ -136,7 +135,7 @@ func (t *Task) Delete(db XODB) error {
 // TasksByCreateAt retrieves a row from 'task' as a Task.
 //
 // Generated from index 'idx_task_create_at'.
-func TasksByCreateAt(db XODB, createAt xoutil.SqTime) ([]*Task, error) {
+func TasksByCreateAt(db XODB, createAt time.Time) ([]*Task, error) {
 	var err error
 
 	// sql query
@@ -214,7 +213,7 @@ func TasksByName(db XODB, name string) ([]*Task, error) {
 // TasksByUpdateAt retrieves a row from 'task' as a Task.
 //
 // Generated from index 'idx_task_update_at'.
-func TasksByUpdateAt(db XODB, updateAt xoutil.SqTime) ([]*Task, error) {
+func TasksByUpdateAt(db XODB, updateAt time.Time) ([]*Task, error) {
 	var err error
 
 	// sql query
@@ -253,7 +252,7 @@ func TasksByUpdateAt(db XODB, updateAt xoutil.SqTime) ([]*Task, error) {
 // TaskByID retrieves a row from 'task' as a Task.
 //
 // Generated from index 'task_id_pkey'.
-func TaskByID(db XODB, id sql.NullInt64) (*Task, error) {
+func TaskByID(db XODB, id int64) (*Task, error) {
 	var err error
 
 	// sql query
