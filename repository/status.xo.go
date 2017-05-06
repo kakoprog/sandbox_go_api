@@ -10,11 +10,11 @@ import (
 
 // Status represents a row from 'status'.
 type Status struct {
-	ID       int64         `json:"id"`        // id
-	Code     string        `json:"code"`      // code
-	Name     string        `json:"name"`      // name
-	CreateAt time.Time     `json:"create_at"` // create_at
-	UpdateAt time.Time     `json:"update_at"` // update_at
+	ID       int64     `json:"id"`        // id
+	Code     string    `json:"code"`      // code
+	Name     string    `json:"name"`      // name
+	CreateAt time.Time `json:"create_at"` // create_at
+	UpdateAt time.Time `json:"update_at"` // update_at
 
 	// xo fields
 	_exists, _deleted bool

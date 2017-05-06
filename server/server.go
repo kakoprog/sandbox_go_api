@@ -1,10 +1,10 @@
 package server
 
 import (
-	"github.com/labstack/echo"
-	"github.com/kakoprog/sandbox_go_api/config"
 	"github.com/kakoprog/sandbox_go_api/api/todo/statuses"
-  "github.com/kakoprog/sandbox_go_api/api/todo/tasks"
+	"github.com/kakoprog/sandbox_go_api/api/todo/tasks"
+	"github.com/kakoprog/sandbox_go_api/config"
+	"github.com/labstack/echo"
 	"strconv"
 )
 
@@ -17,7 +17,7 @@ func Run() {
 }
 
 func setRouting(e *echo.Echo) {
-  routeApi := e.Group("/api")
+	routeApi := e.Group("/api")
 	routeApiTodo := routeApi.Group("/todo")
 	routeApiTodoTasks := routeApiTodo.Group("/tasks")
 	routeApiTodoTasks.GET("", tasks.GetContents)
