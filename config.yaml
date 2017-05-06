@@ -1,0 +1,5 @@
+server:
+  port: 2300
+
+sqlite:
+  file_path: "./sqlite/todo.db"

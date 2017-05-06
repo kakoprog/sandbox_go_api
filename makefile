@@ -1,4 +1,4 @@
-PATH_API_MAIN = api/main.go
+PATH_API_MAIN = main.go
 
 build:
 	go build -o bin/hostos/api $(PATH_API_MAIN)
