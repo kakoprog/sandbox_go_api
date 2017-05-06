@@ -130,6 +130,41 @@ func (s *Status) Delete(db XODB) error {
 	return nil
 }
 
+func Statuses(db XODB) ([]*Status, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`id, code, name, create_at, update_at ` +
+		`FROM status `
+
+	// run query
+	XOLog(sqlstr)
+	q, err := db.Query(sqlstr)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*Status{}
+	for q.Next() {
+		s := Status{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&s.ID, &s.Code, &s.Name, &s.CreateAt, &s.UpdateAt)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &s)
+	}
+
+	return res, nil
+}
+
 // StatusByCode retrieves a row from 'status' as a Status.
 //
 // Generated from index 'sqlite_autoindex_status_1'.

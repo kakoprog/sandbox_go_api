@@ -132,6 +132,41 @@ func (t *Task) Delete(db XODB) error {
 	return nil
 }
 
+func Tasks(db XODB) ([]*Task, error) {
+	var err error
+
+	// sql query
+	const sqlstr = `SELECT ` +
+		`id, name, comment, status, create_at, update_at ` +
+		`FROM task `
+
+	// run query
+	XOLog(sqlstr)
+	q, err := db.Query(sqlstr)
+	if err != nil {
+		return nil, err
+	}
+	defer q.Close()
+
+	// load results
+	res := []*Task{}
+	for q.Next() {
+		t := Task{
+			_exists: true,
+		}
+
+		// scan
+		err = q.Scan(&t.ID, &t.Name, &t.Comment, &t.Status, &t.CreateAt, &t.UpdateAt)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, &t)
+	}
+
+	return res, nil
+}
+
 // TasksByCreateAt retrieves a row from 'task' as a Task.
 //
 // Generated from index 'idx_task_create_at'.
